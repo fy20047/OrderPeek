@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import logo from './assets/logo.jpg';
 // 統一管理 API 基底網址（見 src/config.js）
 import { apiUrl } from './config';
+import ViewsCounter from './components/ViewsCounter';
 
 export default function App() {
   // 受控元件用的狀態（帳號 / 密碼）
@@ -9,56 +10,6 @@ export default function App() {
   const [password, setPassword] = useState('');
   // 錯誤訊息：登入失敗或網路錯誤時顯示
   const [error, setError] = useState('');
-
-  // 頁面底部的瀏覽統計（先用 localStorage 模擬，之後會換後端）
-  const [todayViews, setTodayViews] = useState(0);
-  const [totalViews, setTotalViews] = useState(0);
-
-  /**
-   * 首頁載入時做瀏覽次數統計：
-   * - 用 localStorage 儲存「今日日期」、「今日計數」、「總計數」
-   * - 用 sessionStorage 確保「同一個分頁只加一次」，避免 F5 狂加
-   *
-   * key 命名：
-   * - op_visit_date：YYYY-MM-DD
-   * - op_visit_today：今日計數
-   * - op_visit_total：總計數
-   * - op_session_counted：此分頁是否已經計過
-   */
-  useEffect(() => {
-    const todayKey = 'op_visit_date';
-    const todayCountKey = 'op_visit_today';
-    const totalKey = 'op_visit_total';
-    const sessionFlag = 'op_session_counted';
-
-    const todayStr = new Date().toISOString().slice(0, 10); // 例如 "2025-09-12"
-    const storedDay = localStorage.getItem(todayKey);
-
-    // 跨日就重置「今日計數」
-    if (storedDay !== todayStr) {
-      localStorage.setItem(todayKey, todayStr);
-      localStorage.setItem(todayCountKey, '0');
-    }
-    // 首次使用者（或清庫後）初始化總計
-    if (!localStorage.getItem(totalKey)) {
-      localStorage.setItem(totalKey, '0');
-    }
-
-    // 一個分頁只加一次統計
-    if (!sessionStorage.getItem(sessionFlag)) {
-      const t = parseInt(localStorage.getItem(totalKey) || '0', 10) + 1;
-      localStorage.setItem(totalKey, String(t));
-
-      const d = parseInt(localStorage.getItem(todayCountKey) || '0', 10) + 1;
-      localStorage.setItem(todayCountKey, String(d));
-
-      sessionStorage.setItem(sessionFlag, '1');
-    }
-
-    // 映射到狀態以觸發畫面更新
-    setTodayViews(parseInt(localStorage.getItem(todayCountKey) || '0', 10));
-    setTotalViews(parseInt(localStorage.getItem(totalKey) || '0', 10));
-  }, []);
 
   /**
    * 送出登入表單：
@@ -200,9 +151,7 @@ export default function App() {
 
       {/* 底部瀏覽統計（先前端，日後改後端真數據） */}
       <footer className="footer">
-        <div className="views" aria-live="polite">
-          今日：{todayViews}　|　累計：{totalViews}
-        </div>
+        <ViewsCounter className="views" />
       </footer>
     </div>
   );

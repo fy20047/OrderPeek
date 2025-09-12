@@ -4,10 +4,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class HelloController {
+public class AdminController {
 
-    @GetMapping("/hello")
-    public String hello() {
-        return "Hello OrderPeek Backend!";
+    @GetMapping("/admin")
+    public String adminPage() {
+        return "<h1>此頁為管理員頁面，功能候補</h1>";
     }
 }
