@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import logo from './assets/logo.jpg';
+// 統一管理 API 基底網址（見 src/config.js）
+import { apiUrl } from './config';
 
 export default function App() {
   // 受控元件用的狀態（帳號 / 密碼）
   const [account, setAccount] = useState('');
   const [password, setPassword] = useState('');
+  // 錯誤訊息：登入失敗或網路錯誤時顯示
+  const [error, setError] = useState('');
 
   // 頁面底部的瀏覽統計（先用 localStorage 模擬，之後會換後端）
   const [todayViews, setTodayViews] = useState(0);
@@ -64,7 +68,7 @@ export default function App() {
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+ 
     // TODO: 換成真 API
     // 範例（之後開後端時直接把註解拿掉）：
     // const res = await fetch('/api/auth/login', {
@@ -81,7 +85,33 @@ export default function App() {
     //   alert(data.message || '登入失敗');
     // }
 
-    console.log('login submit', { account, password });
+    // 清空上一輪錯誤並呼叫後端登入 API
+    setError('');
+    try {
+      const res = await fetch(apiUrl('/api/auth/login'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ account, password }),
+        // 若未來改為 Cookie/Session 驗證，請開啟下行並調整後端 CORS：
+        // credentials: 'include',
+      });
+
+      // 後端可能回傳非 JSON，保險處理避免拋錯
+      const text = await res.text();
+      let data = {};
+      try { data = text ? JSON.parse(text) : {}; } catch (_) {}
+
+      if (res.ok) {
+        alert(`登入成功，角色：${data.role || 'UNKNOWN'}`);
+        // 之後再導頁：
+        // if (data.role === 'ADMIN') location.href = '/admin';
+        // else location.href = '/app';
+      } else {
+        setError(data.message || '登入失敗');
+      }
+    } catch (_) {
+      setError('無法連線到伺服器');
+    }
   };
 
   /**
@@ -135,6 +165,11 @@ export default function App() {
               autoComplete="current-password"
               required
             />
+
+            {/* 錯誤訊息（有錯誤時顯示） */}
+            {error && (
+              <div className="error" role="alert" aria-live="polite">{error}</div>
+            )}
 
             <button
               className="submitBtn"
