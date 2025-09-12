@@ -11,14 +11,15 @@ export default function App() {
   const [totalViews, setTotalViews] = useState(0);
 
   /**
-   載入時做瀏覽次數統計：
-   - 用 localStorage 儲存「今日日期」、「今日計數」、「總計數」
-   - 用 sessionStorage 確保「同一個分頁只加一次」，避免 F5 狂加
-   key 命名：
-   - op_visit_date：YYYY-MM-DD
-   - op_visit_today：今日計數
-   - op_visit_total：總計數
-   - op_session_counted：此分頁是否已經計過
+   * 首頁載入時做瀏覽次數統計：
+   * - 用 localStorage 儲存「今日日期」、「今日計數」、「總計數」
+   * - 用 sessionStorage 確保「同一個分頁只加一次」，避免 F5 狂加
+   *
+   * key 命名：
+   * - op_visit_date：YYYY-MM-DD
+   * - op_visit_today：今日計數
+   * - op_visit_total：總計數
+   * - op_session_counted：此分頁是否已經計過
    */
   useEffect(() => {
     const todayKey = 'op_visit_date';
@@ -29,12 +30,12 @@ export default function App() {
     const todayStr = new Date().toISOString().slice(0, 10); // 例如 "2025-09-12"
     const storedDay = localStorage.getItem(todayKey);
 
-    // 跨日就重置今日計數
+    // 跨日就重置「今日計數」
     if (storedDay !== todayStr) {
       localStorage.setItem(todayKey, todayStr);
       localStorage.setItem(todayCountKey, '0');
     }
-    // 初始化總計
+    // 首次使用者（或清庫後）初始化總計
     if (!localStorage.getItem(totalKey)) {
       localStorage.setItem(totalKey, '0');
     }
@@ -50,16 +51,45 @@ export default function App() {
       sessionStorage.setItem(sessionFlag, '1');
     }
 
-    // useState 觸發畫面更新
+    // 映射到狀態以觸發畫面更新
     setTodayViews(parseInt(localStorage.getItem(todayCountKey) || '0', 10));
     setTotalViews(parseInt(localStorage.getItem(totalKey) || '0', 10));
   }, []);
 
+  /**
+   * 送出登入表單：
+   * - 目前先阻止預設行為 + console.log
+   * - 後續會改成 fetch('/api/auth/login', ...) 打後端
+   * - 成功後依角色導向 /admin 或 /app
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // TODO: 換成真 API
+    // 範例（之後開後端時直接把註解拿掉）：
+    // const res = await fetch('/api/auth/login', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({ account, password }),
+    //   credentials: 'include', // 若用 Cookie-based auth
+    // });
+    // const data = await res.json();
+    // if (res.ok) {
+    //   if (data.role === 'ADMIN') location.href = '/admin';
+    //   else location.href = '/app';
+    // } else {
+    //   alert(data.message || '登入失敗');
+    // }
+
     console.log('login submit', { account, password });
   };
+
+  /**
+   * 鍵盤可用性：
+   * - input 已經是表單的一部分，按 Enter 會觸發 onSubmit
+   * - label.htmlFor 對應 input.id，提升無障礙體驗
+   * - autoComplete="username"/"current-password" 讓瀏覽器能記住
+   */
 
   return (
     <div className="page" /* 整頁骨架：背景色、垂直布局 */>
@@ -71,7 +101,7 @@ export default function App() {
       {/* 中央 */}
       <main className="main">
         <section className="card" aria-label="Login card">
-          {/* 圓形 LOGO 區 */}
+          {/* 圓形 LOGO 區（圖檔請放 public/logo.png） */}
           <div className="logoWrap">
             <img className="logo" src={logo} alt="OrderPeek Logo" />
           </div>
@@ -133,7 +163,7 @@ export default function App() {
         </section>
       </main>
 
-      {/* 瀏覽統計（日後改後端真數據） */}
+      {/* 底部瀏覽統計（先前端，日後改後端真數據） */}
       <footer className="footer">
         <div className="views" aria-live="polite">
           今日：{todayViews}　|　累計：{totalViews}
