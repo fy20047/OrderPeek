@@ -24,8 +24,7 @@ export default function ColumnPickerModal({
 
   function toggle(field) {
     const next = new Set(selected);
-    if (next.has(field)) next.delete(field);
-    else next.add(field);
+    next.has(field) ? next.delete(field) : next.add(field);
     setSelected(next);
   }
 
@@ -58,7 +57,21 @@ export default function ColumnPickerModal({
               <button className="logoutBtn" type="button" onClick={selectAll}>全選</button>
               <button className="logoutBtn" type="button" onClick={clearAll}>全不選</button>
             </div>
-            <div style={{ marginTop: 8, display: "flex", gap: 12, flexWrap: "wrap" }}>
+
+            {/* 欄位清單（可換行 + 可捲動） */}
+            <div
+                style={{
+                border: "1px solid var(--border)",
+                borderRadius: 8,
+                padding: 8,
+                background: "#fff",
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 8,
+                maxHeight: "220px",      // 超過就出現卷軸
+                overflowY: "auto",
+                }}
+            >
               {headers.map((h) => (
                 <label key={h} style={chipStyle}>
                   <input
@@ -73,6 +86,7 @@ export default function ColumnPickerModal({
             </div>
           </div>
 
+          {/* 預覽表（跟著選到的欄位顯示） */}
           <div>
             <div style={{ fontWeight: 600, margin: "8px 0" }}>資料預覽（前 5 列）</div>
             <div style={{ overflowX: "auto", border: "1px solid var(--border)", borderRadius: 8 }}>
@@ -103,7 +117,7 @@ export default function ColumnPickerModal({
 
           <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
             <button className="logoutBtn" type="button" onClick={onClose}>取消</button>
-            <button className="submitBtn" type="button" onClick={handleSave}>儲存欄位</button>
+            <button className="logoutBtn" type="button" onClick={handleSave}>儲存欄位</button>
           </div>
         </div>
       </div>
@@ -123,6 +137,8 @@ const backdropStyle = {
 
 const modalStyle = {
   width: "min(920px, 100%)",
+  maxHeight: "85vh",        // 視窗本身也限制高度避免溢出
+  overflow: "auto",         // 視窗內可捲動
   background: "var(--card-bg)",
   border: "1px solid var(--border)",
   borderRadius: "12px",

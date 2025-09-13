@@ -14,7 +14,7 @@
 //     </div>
 //   );
 // }
-import { useState } from "react";
+import { useState, useRef  } from "react";
 import * as XLSX from "xlsx";
 import LogoutButton from "../components/LogoutButton.jsx";
 import ErrorMessage from "../components/ErrorMessage.jsx";
@@ -29,6 +29,15 @@ export default function Admin() {
   const [rows, setRows] = useState([]);        // 解析出的資料列（物件陣列）
   const [pickerOpen, setPickerOpen] = useState(false);
   const [visibleFields, setVisibleFields] = useState([]); // 管理者選擇要公開的欄位
+
+  const fileInputRef = useRef(null);
+  
+  function resetInput() {
+    setInputKey(k => k + 1);                   // 方案 A：強制重新掛載 input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";         // 方案 B：直接清空 value
+    }
+  }
 
   function handlePick(e) {
     const f = e.target.files?.[0];
@@ -49,7 +58,11 @@ export default function Admin() {
     function clearFile() {
     setFile(null);
     setError("");
-    setInputKey(k => k + 1); // 也把 input 清乾淨
+    setHeaders([]);
+    setRows([]);
+    setVisibleFields([]);
+    // setInputKey(k => k + 1); // 也把 input 清乾淨
+    resetInput();
   }
 
   // 讀檔並解析
@@ -107,6 +120,8 @@ export default function Admin() {
     return obj;
   });
 
+  
+
   return (
     <div className="page">
       <header className="header">
@@ -119,10 +134,12 @@ export default function Admin() {
            <h2 style={{ marginTop: 0 }}>上傳 Excel 檔案</h2>
 
           <input
-            key={inputKey}
+            key={inputKey}                            // 方案 A：key 改變會重掛 input
+            ref={fileInputRef}                        // 方案 B：可以直接清 value
             type="file"
             accept=".xlsx,.xls"
             onChange={handlePick}
+            onClick={(e) => { e.currentTarget.value = ""; }} // ← 進一步保險：每次點都清空
             style={{ marginTop: 12, marginBottom: 12 }}
           />
 
@@ -160,7 +177,7 @@ export default function Admin() {
               {headers.length > 0 && (
                 <button
                   type="button"
-                  className="submitBtn"
+                  className="logoutBtn"
                   onClick={() => setPickerOpen(true)}
                 >
                   選擇要公開的欄位
