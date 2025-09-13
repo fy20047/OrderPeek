@@ -1,14 +1,16 @@
 import React, { useState } from "react";
-// 統一管理 API 基底網址（見 src/config.js）
-import { apiUrl } from "../config";
+import { apiUrl } from "../config"; // 統一管理 API 基底網址（見 src/config.js）
+import { useNavigate } from "react-router-dom"; // react-router 的官方方式，不會整頁 reload
+import ErrorMessage from "../components/ErrorMessage.jsx";
+import { setRole } from "../lib/auth.js";
 
 export default function Login() {
   // 受控元件用的狀態（帳號 / 密碼）
   const [account, setAccount] = useState("");
   const [password, setPassword] = useState("");
-  // 錯誤訊息：登入失敗或網路錯誤時顯示
-  const [error, setError] = useState("");
-
+  const [error, setError] = useState(""); // 錯誤訊息：登入失敗或網路錯誤時顯示
+  const [loading, setLoading] = useState(false);
+  const nav = useNavigate();
   /**
    * 送出登入表單：
    * - 目前先阻止預設行為 + console.log
@@ -17,6 +19,7 @@ export default function Login() {
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return; // 避免連點
     // TODO: 換成真 API
     // 範例（之後開後端時直接把註解拿掉）：
     // const res = await fetch('/api/auth/login', {
@@ -35,44 +38,47 @@ export default function Login() {
 
     // 清空上一輪錯誤並呼叫後端登入 API
     setError("");
+    setLoading(true); // 送出前設為 true
 
     try {
       const res = await fetch(apiUrl("/api/auth/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ account, password }),
-        // 若未來改為 Cookie/Session 驗證，請開啟下行並調整後端 CORS：
+        // 若改為 Cookie/Session 驗證，開啟下行並調整後端 CORS：
         // credentials: 'include',
       });
 
-      // 後端可能回傳非 JSON，保險處理避免拋錯
-      const text = await res.text();
+      const text = await res.text(); // 後端可能回傳非 JSON，保險處理避免拋錯
       let data = {};
       try {
         data = text ? JSON.parse(text) : {};
-      } catch (_) {}
+      } catch {}
 
-      if (res.ok) {
-        alert(`登入成功，角色：${data.role || 'UNKNOWN'}`);
+      if (res.ok && data?.role) {
+        setRole(data.role); // 記住角色，讓路由守門可判斷
+        // alert(`登入成功，角色：${data.role || 'UNKNOWN'}`);
         // 成功 → 依角色跳轉
         if (data.role === "ADMIN") {
-          window.location.href = "/admin";
+          nav("/admin", { replace: true });
         } else if (data.role === "USER") {
-          window.location.href = "/app";
+          nav("/app", { replace: true });
         } else {
-          alert(`登入成功，但角色未知：${data.role}`);
+          setError(`登入成功，但角色未知：${data.role}`);
         }
       } else {
         // 失敗 → 顯示後端錯誤訊息
         setError(data.message || "登入失敗");
       }
-    } catch (_) {
+    } catch {
       setError("無法連線到伺服器");
+    } finally {
+      setLoading(false); // 無論成功失敗都關閉 loading
     }
   };
   
   /**
-   * 鍵盤可用性：
+   * 鍵盤：
    * - input 已經是表單的一部分，按 Enter 會觸發 onSubmit
    * - label.htmlFor 對應 input.id，提升無障礙體驗
    * - autoComplete="username"/"current-password" 讓瀏覽器能記住
@@ -105,15 +111,17 @@ export default function Login() {
         required
       />
 
-      {error && (
+      {/* {error && (
         <div className="error" role="alert" aria-live="polite">
           {error}
         </div>
-      )}
+      )} */}
+      {error && <ErrorMessage>{error}</ErrorMessage>}
 
       <button
         className="submitBtn"
         type="submit"
+        disabled={loading}
         onClick={(e) => {
           const btn = e.currentTarget;
           const circle = document.createElement("span");

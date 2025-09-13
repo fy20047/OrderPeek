@@ -1,7 +1,7 @@
 import React from 'react';
 import logo from './assets/logo.jpg';
 import ViewsCounter from './components/ViewsCounter';
-import Login from "./components/Login";
+import Login from "./pages/Login";
 
 export default function App() {
   return (

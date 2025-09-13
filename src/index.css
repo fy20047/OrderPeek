@@ -114,6 +114,30 @@ body {
   box-shadow: 0 0 0 3px #5832251f;
 }
 
+.logoutBtn {
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  border: none;
+  border-radius: var(--radius-xl);
+  cursor: pointer;
+  font-weight: 600;
+  padding: 6px 14px;
+  font-size: 14px;
+  box-shadow: 0 2px 0 #3a1f1f;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  margin-left: auto; /* 把按鈕推到最右邊 */
+}
+
+.logoutBtn:hover {
+  filter: brightness(1.05);
+}
+
+.logoutBtn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #3a1f1f;
+}
+
+
 .submitBtn {
   margin-top: 8px;
   height: 40px;

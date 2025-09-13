@@ -7,6 +7,7 @@ import "./index.css";
 import App from "./App.jsx";         // 首頁（登入畫面）
 import Admin from "./pages/Admin.jsx"; // 登入後的管理員頁面
 import UserApp from "./pages/UserApp.jsx"; // 登入後的使用者頁面
+import RoleRoute from "./routes/RoleRoute.jsx";
 
 
 // 瀏覽器的網址有很多可能：
@@ -23,11 +24,18 @@ createRoot(document.getElementById("root")).render(
         {/* "/" → 預設首頁 → App (登入畫面) */}
         <Route path="/" element={<App />} />
 
-        {/* "/admin" → 管理員頁面 */}
-        <Route path="/admin" element={<Admin />} />
+        {/* 只有 ADMIN 可進 */}
+        <Route element={<RoleRoute allow="ADMIN" />}>
+          <Route path="/admin" element={<Admin />} />
+        </Route>
 
-        {/* "/app" → 使用者頁面 */}
-        <Route path="/app" element={<UserApp />} />
+        {/* 只有 USER 可進 */}
+        <Route element={<RoleRoute allow="USER" />}>
+          <Route path="/app" element={<UserApp />} />
+        </Route>
+
+        {/* 其他路徑回登入 */}
+        <Route path="*" element={<App />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>
