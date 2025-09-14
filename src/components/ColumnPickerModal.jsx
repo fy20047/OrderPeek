@@ -9,9 +9,11 @@ export default function ColumnPickerModal({
   rows = [],           // 解析出的列資料（每列為物件）
   initialSelected = [],// 預設勾選欄位
   onSave,              // (selectedFields) => void
+  displayName,
 }) {
   const [selected, setSelected] = useState(new Set(initialSelected));
   const [error, setError] = useState("");
+  const label = (h) => displayName ? displayName(h) : h;
 
   useEffect(() => {
     setSelected(new Set(initialSelected));
@@ -53,7 +55,7 @@ export default function ColumnPickerModal({
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
           <div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12}}>
               <button className="logoutBtn" type="button" onClick={selectAll}>全選</button>
               <button className="logoutBtn" type="button" onClick={clearAll}>全不選</button>
             </div>
@@ -80,7 +82,7 @@ export default function ColumnPickerModal({
                     onChange={() => toggle(h)}
                     style={{ marginRight: 6 }}
                   />
-                  {h}
+                  {label(h)}
                 </label>
               ))}
             </div>
@@ -94,7 +96,7 @@ export default function ColumnPickerModal({
                 <thead>
                   <tr style={{ background: "#f8f8f8" }}>
                     {headers.filter(h => selected.has(h)).map((h) => (
-                      <th key={h} style={cellTh}>{h}</th>
+                      <th key={h} style={cellTh}>{label(h)}</th>
                     ))}
                   </tr>
                 </thead>
@@ -136,7 +138,7 @@ const backdropStyle = {
 };
 
 const modalStyle = {
-  width: "min(920px, 100%)",
+  width: "min(1200px, 100%)",
   maxHeight: "85vh",        // 視窗本身也限制高度避免溢出
   overflow: "auto",         // 視窗內可捲動
   background: "var(--card-bg)",

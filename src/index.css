@@ -66,12 +66,53 @@ body {
   box-shadow: 0 6px 20px rgba(0,0,0,0.04);
 }
 
+.card-wide {
+  width: 100%;
+  max-width: clamp(960px, 80vw, 1600px);
+  padding: 32px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+}
+
+@media (max-width: 980px) {
+  .card-wide { max-width: 96vw; }  /* 小螢幕就跟著螢幕縮 */
+}
+
+/* 表格外層滾動容器：
+   內容太寬時可左右滑
+   限制高度（70vh），資料太多可上下滑 */
+.tableScroll {
+  overflow: auto;        /* 同時支援 X/Y 滾動 */
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  max-height: 70vh;      /* 視窗 70% 高度，避免撐爆頁面 */
+}
+
+/* 表格最小寬：給多欄時保有橫向滾動空間 */
+.tableScroll table {
+  min-width: max(960px, 100%);
+  border-collapse: collapse;     
+  white-space: nowrap;   /* 內容不換行 */
+}
+
+.tableScroll th,
+.tableScroll td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  white-space: nowrap;
+}
+
+.tableScroll thead tr { background: #f8f8f8; }
+
 /* 圓形 LOGO */
 .logoWrap {
   display: flex;
   justify-content: center;
   margin-bottom: 12px;
 }
+
 .logo {
   width: 96px;
   height: 96px;
@@ -139,6 +180,8 @@ body {
 
 
 .submitBtn {
+  position: relative;
+  overflow: hidden;
   margin-top: 8px;
   height: 40px;
   padding: 0 10px;
@@ -159,11 +202,6 @@ body {
 .submitBtn:active {
   transform: translateY(2px);  /* 按下去往下移動 */
   box-shadow: 0 1px 0 #3a1f1f; /* 陰影縮小，看起來像真的壓下去 */
-}
-
-.submitBtn {
-  position: relative;
-  overflow: hidden;
 }
 
 .ripple {
