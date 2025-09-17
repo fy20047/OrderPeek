@@ -40,3 +40,65 @@
 .read-the-docs {
   color: #888;
 }
+
+/* 讓外層可滾動容器與內層盒子吃滿 */
+.tableScroll,
+.tableScroll > div {
+  width: 100%;
+}
+
+/* 表格吃滿 + 固定布局避免欄寬亂跳 */
+.fullwidth-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* 平均分配欄寬，剩餘空間也會被填滿 */
+}
+
+/* 優化儲存格顯示（不換行、超出以省略號顯示） */
+.fullwidth-table th,
+.fullwidth-table td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ====== HeaderRowPickerModal 寬度與表格 ====== */
+
+/* 對話框外觀：撐到 90vw，並限制最大寬 */
+.modal-panel {
+  width: min(1200px, 90vw);
+}
+
+/* 內容區：限制高度並可捲動 */
+.modal-body-scroll {
+  max-height: 70vh;
+  overflow: auto;
+}
+
+/* 表格外層：100% + 需要時可捲動 */
+.modal-table-wrap {
+  width: 100%;
+  overflow: auto;
+}
+
+/* 表格本體：100% 撐滿 + 固定布局 */
+.modal-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+/* 儲存格：不換行且超出省略（你想要可換行就拿掉 white-space） */
+.modal-table th,
+.modal-table td {
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
+  padding: 6px 10px;
+  border: 1px solid #eadccf;
+}
+
+/* 表頭底色（可依你主題色調整） */
+.modal-table thead tr {
+  background: #f8f8f8;
+}

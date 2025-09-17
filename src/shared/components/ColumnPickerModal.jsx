@@ -1,26 +1,25 @@
-// src/components/ColumnPickerModal.jsx
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import ErrorMessage from "./ErrorMessage.jsx";
 
 export default function ColumnPickerModal({
   open,
   onClose,
   headers = [],
-  rows = [],           // 解析出的列資料（每列為物件）
-  initialSelected = [],// 預設勾選欄位
-  onSave,              // (selectedFields) => void
+  rows = [], // 原始資料列，每列都是物件
+  initialSelected = [], // 預設勾選的欄位清單
+  onSave, // 儲存結果的回呼函式
   displayName,
 }) {
   const [selected, setSelected] = useState(new Set(initialSelected));
   const [error, setError] = useState("");
-  const label = (h) => displayName ? displayName(h) : h;
+  const label = (h) => (displayName ? displayName(h) : h);
 
   useEffect(() => {
     setSelected(new Set(initialSelected));
     setError("");
   }, [open, initialSelected]);
 
-  const previewRows = useMemo(() => rows.slice(0, 5), [rows]); // 只預覽前5列
+  const previewRows = useMemo(() => rows.slice(0, 5), [rows]); // 預覽前 5 筆資料
 
   if (!open) return null;
 
@@ -33,13 +32,14 @@ export default function ColumnPickerModal({
   function selectAll() {
     setSelected(new Set(headers));
   }
+
   function clearAll() {
     setSelected(new Set());
   }
 
   function handleSave() {
     if (selected.size === 0) {
-      setError("請至少選擇一個欄位");
+      setError("請至少勾選一個欄位");
       return;
     }
     onSave(Array.from(selected));
@@ -50,19 +50,19 @@ export default function ColumnPickerModal({
       <div style={modalStyle} role="dialog" aria-modal="true" aria-label="欄位挑選">
         <div style={{ display: "flex", alignItems: "center", marginBottom: 12 }}>
           <h3 style={{ margin: 0, flex: 1 }}>選擇要公開的欄位</h3>
-          <button className="logoutBtn" onClick={onClose}>關閉</button>
+          <button className="logoutBtn" onClick={onClose}>取消</button>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
           <div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12}}>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
               <button className="logoutBtn" type="button" onClick={selectAll}>全選</button>
-              <button className="logoutBtn" type="button" onClick={clearAll}>全不選</button>
+              <button className="logoutBtn" type="button" onClick={clearAll}>全部清除</button>
             </div>
 
-            {/* 欄位清單（可換行 + 可捲動） */}
+            {/* 欄位清單，可捲動瀏覽 */}
             <div
-                style={{
+              style={{
                 border: "1px solid var(--border)",
                 borderRadius: 8,
                 padding: 8,
@@ -70,9 +70,9 @@ export default function ColumnPickerModal({
                 display: "flex",
                 flexWrap: "wrap",
                 gap: 8,
-                maxHeight: "220px",      // 超過就出現卷軸
+                maxHeight: "220px", // 超過高度時出現捲軸
                 overflowY: "auto",
-                }}
+              }}
             >
               {headers.map((h) => (
                 <label key={h} style={chipStyle}>
@@ -88,14 +88,14 @@ export default function ColumnPickerModal({
             </div>
           </div>
 
-          {/* 預覽表（跟著選到的欄位顯示） */}
+          {/* 欄位預覽，協助確認資料內容 */}
           <div>
-            <div style={{ fontWeight: 600, margin: "8px 0" }}>資料預覽（前 5 列）</div>
+            <div style={{ fontWeight: 600, margin: "8px 0" }}>資料預覽（最多 5 筆）</div>
             <div style={{ overflowX: "auto", border: "1px solid var(--border)", borderRadius: 8 }}>
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <table style={{ borderCollapse: "collapse", minWidth: "max-content" }}>
                 <thead>
                   <tr style={{ background: "#f8f8f8" }}>
-                    {headers.filter(h => selected.has(h)).map((h) => (
+                    {headers.filter((h) => selected.has(h)).map((h) => (
                       <th key={h} style={cellTh}>{label(h)}</th>
                     ))}
                   </tr>
@@ -103,7 +103,7 @@ export default function ColumnPickerModal({
                 <tbody>
                   {previewRows.map((row, idx) => (
                     <tr key={idx}>
-                      {headers.filter(h => selected.has(h)).map((h) => (
+                      {headers.filter((h) => selected.has(h)).map((h) => (
                         <td key={h} style={cellTd}>
                           {row?.[h] ?? ""}
                         </td>
@@ -139,8 +139,8 @@ const backdropStyle = {
 
 const modalStyle = {
   width: "min(1200px, 100%)",
-  maxHeight: "85vh",        // 視窗本身也限制高度避免溢出
-  overflow: "auto",         // 視窗內可捲動
+  maxHeight: "85vh",        // 限制視窗高度以避免內容溢出
+  overflow: "auto",         // 內容高度超過時可以滾動
   background: "var(--card-bg)",
   border: "1px solid var(--border)",
   borderRadius: "12px",
@@ -158,5 +158,5 @@ const chipStyle = {
   background: "#fff",
 };
 
-const cellTh = { border: "1px solid #ddd", padding: "8px", textAlign: "left" };
-const cellTd = { border: "1px solid #ddd", padding: "8px" };
+const cellTh = { border: "1px solid #ddd", padding: "8px", textAlign: "left", whiteSpace: "nowrap" };
+const cellTd = { border: "1px solid #ddd", padding: "8px", whiteSpace: "nowrap" };

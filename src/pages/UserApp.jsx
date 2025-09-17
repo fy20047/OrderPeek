@@ -1,32 +1,26 @@
-// import LogoutButton from "../components/LogoutButton.jsx";
-
-// export default function UserApp() {
-//   return (
-//     <div style={{ padding: "2rem" }}>
-//       <header style={{ display: "flex", alignItems: "center" }}>
-//         <h1 style={{ flex: 1 }}>使用者頁面</h1>
-//         <LogoutButton /> {/* 右上角登出 */}
-//       </header>
-//       <p>這裡之後會放使用者功能。</p>
-//     </div>
-//   );
-// }
+﻿import LogoutButton from "@/shared/components/LogoutButton.jsx";
+import { loadPublished } from "@/features/publish/api.js";
 import { useEffect, useMemo, useState } from "react";
-import LogoutButton from "../components/LogoutButton.jsx";
-import { loadPublished } from "../lib/publish.js";
 
 export default function UserApp() {
   const [published, setPublished] = useState(null); // { visibleFields, rows, ts } 或 null
-  const [q, setQ] = useState(""); // 簡單關鍵字搜尋
+  const [q, setQ] = useState(""); // 簡易關鍵字搜尋
 
   useEffect(() => {
-    setPublished(loadPublished());
+    const update = () => setPublished(loadPublished());
+    update();
+    window.addEventListener("storage", update);
+    window.addEventListener("op:published", update);
+    return () => {
+      window.removeEventListener("storage", update);
+      window.removeEventListener("op:published", update);
+    };
   }, []);
 
   const visibleFields = published?.visibleFields || [];
   const rows = published?.rows || [];
 
-  // 簡單關鍵字過濾（任何欄位含有關鍵字就顯示）
+  // 只要任一欄包含關鍵字就顯示該列
   const filtered = useMemo(() => {
     if (!q.trim()) return rows;
     const kw = q.trim().toLowerCase();
@@ -38,13 +32,13 @@ export default function UserApp() {
   return (
     <div className="page">
       <header className="header">
-        <div className="brand" style={{ flex: 1 }}>OrderPeek 使用者介面</div>
-        <LogoutButton /> {/* 右上角登出 */}
+        <div className="brand" style={{ flex: 1 }}>OrderPeek 使用者頁面</div>
+        <LogoutButton />
       </header>
 
       <main className="main">
         <section className="card card-wide" aria-label="User card">
-          <h2 style={{ marginTop: 0 }}>我的訂單</h2>
+          <h2 style={{ marginTop: 0 }}>最新發布的訂單資料</h2>
 
           {!published ? (
             <EmptyState />
@@ -54,12 +48,12 @@ export default function UserApp() {
                 <input
                   className="input"
                   style={{ maxWidth: 280 }}
-                  placeholder="搜尋關鍵字"
+                  placeholder="輸入關鍵字搜尋"
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
                 />
                 <div style={{ fontSize: 12, opacity: 0.7, marginLeft: "auto" }}>
-                  最後更新：{new Date(published.ts).toLocaleString()}
+                  最後更新：{published?.ts ? new Date(published.ts).toLocaleString() : "-"}
                 </div>
               </div>
 
@@ -108,9 +102,9 @@ function EmptyState() {
       background: "#fff",
       color: "var(--fg)",
     }}>
-      <div style={{ fontWeight: 600, marginBottom: 6 }}>尚未發佈資料</div>
+      <div style={{ fontWeight: 600, marginBottom: 6 }}>尚未發布資料</div>
       <div style={{ fontSize: 14, opacity: 0.8 }}>
-        請聯絡管理員發佈最新資料，或稍後再試。
+        請聯絡管理員，確認是否已在後台發布最新資料。
       </div>
     </div>
   );

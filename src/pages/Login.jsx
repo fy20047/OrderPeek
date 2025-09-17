@@ -1,64 +1,46 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { apiUrl } from "../config"; // 統一管理 API 基底網址（見 src/config.js）
-import { useNavigate } from "react-router-dom"; // react-router 的官方方式，不會整頁 reload
-import ErrorMessage from "../components/ErrorMessage.jsx";
-import { setRole } from "../lib/auth.js";
+import { useNavigate } from "react-router-dom"; // 使用官方路由 hook，避免整頁重新載入
+import ErrorMessage from "@/shared/components/ErrorMessage.jsx";
+import { setRole } from "@/features/auth/api.js";
 
 export default function Login() {
-  // 受控元件用的狀態（帳號 / 密碼）
   const [account, setAccount] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(""); // 錯誤訊息：登入失敗或網路錯誤時顯示
+  const [error, setError] = useState(""); // 登入失敗或網路錯誤時顯示
   const [loading, setLoading] = useState(false);
   const nav = useNavigate();
+
   /**
-   * 送出登入表單：
-   * - 目前先阻止預設行為 + console.log
-   * - 後續會改成 fetch('/api/auth/login', ...) 打後端
-   * - 成功後依角色導向 /admin 或 /app
+   * 提交登入表單：
+   * - 先阻止預設提交行為
+   * - 呼叫後端登入 API
+   * - 依回傳角色導向管理或使用者頁面
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (loading) return; // 避免連點
-    // TODO: 換成真 API
-    // 範例（之後開後端時直接把註解拿掉）：
-    // const res = await fetch('/api/auth/login', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ account, password }),
-    //   credentials: 'include', // 若用 Cookie-based auth
-    // });
-    // const data = await res.json();
-    // if (res.ok) {
-    //   if (data.role === 'ADMIN') location.href = '/admin';
-    //   else location.href = '/app';
-    // } else {
-    //   alert(data.message || '登入失敗');
-    // }
+    if (loading) return; // 避免重複點擊
 
-    // 清空上一輪錯誤並呼叫後端登入 API
     setError("");
-    setLoading(true); // 送出前設為 true
+    setLoading(true); // 送出前啟用 loading 狀態
 
     try {
       const res = await fetch(apiUrl("/api/auth/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ account, password }),
-        // 若改為 Cookie/Session 驗證，開啟下行並調整後端 CORS：
-        // credentials: 'include',
+        // 若改為 Cookie/Session 驗證，需開啟 credentials 並調整後端 CORS
+        // credentials: "include",
       });
 
-      const text = await res.text(); // 後端可能回傳非 JSON，保險處理避免拋錯
+      const text = await res.text(); // 後端可能回傳非 JSON，先以文字接收
       let data = {};
       try {
         data = text ? JSON.parse(text) : {};
       } catch {}
 
       if (res.ok && data?.role) {
-        setRole(data.role); // 記住角色，讓路由守門可判斷
-        // alert(`登入成功，角色：${data.role || 'UNKNOWN'}`);
-        // 成功 → 依角色跳轉
+        setRole(data.role); // 記住角色予路由判斷使用
         if (data.role === "ADMIN") {
           nav("/admin", { replace: true });
         } else if (data.role === "USER") {
@@ -67,21 +49,20 @@ export default function Login() {
           setError(`登入成功，但角色未知：${data.role}`);
         }
       } else {
-        // 失敗 → 顯示後端錯誤訊息
         setError(data.message || "登入失敗");
       }
     } catch {
       setError("無法連線到伺服器");
     } finally {
-      setLoading(false); // 無論成功失敗都關閉 loading
+      setLoading(false); // 完成後恢復按鈕狀態
     }
   };
-  
+
   /**
-   * 鍵盤：
-   * - input 已經是表單的一部分，按 Enter 會觸發 onSubmit
-   * - label.htmlFor 對應 input.id，提升無障礙體驗
-   * - autoComplete="username"/"current-password" 讓瀏覽器能記住
+   * 輸入欄說明：
+   * - Enter 直接提交表單
+   * - label.htmlFor 對應 input.id 以提升無障礙體驗
+   * - autoComplete 幫助瀏覽器記住帳密
    */
 
   return (
@@ -111,11 +92,6 @@ export default function Login() {
         required
       />
 
-      {/* {error && (
-        <div className="error" role="alert" aria-live="polite">
-          {error}
-        </div>
-      )} */}
       {error && <ErrorMessage>{error}</ErrorMessage>}
 
       <button
@@ -134,9 +110,7 @@ export default function Login() {
           circle.classList.add("ripple");
 
           const ripple = btn.getElementsByClassName("ripple")[0];
-          if (ripple) {
-            ripple.remove();
-          }
+          if (ripple) ripple.remove();
           btn.appendChild(circle);
         }}
       >

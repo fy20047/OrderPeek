@@ -1,33 +1,33 @@
-import React from 'react';
-import logo from './assets/logo.jpg';
-import ViewsCounter from './components/ViewsCounter';
+﻿import React from "react";
+import logo from "./assets/logo.jpg";
+import ViewsCounter from "@/shared/components/ViewsCounter.jsx";
 import Login from "./pages/Login";
 
 export default function App() {
   return (
-    <div className="page" /* 整頁骨架：背景色、垂直布局 */>
-      {/* 左上角放名稱 */}
+    <div className="page">
+      {/* 上方品牌名稱 */}
       <header className="header">
         <div className="brand">OrderPeek</div>
       </header>
 
-      {/* 中央 */}
+      {/* 中央登入卡片 */}
       <main className="main">
         <section className="card" aria-label="Login card">
-          {/* 圓形 LOGO 區（圖檔放 public/logo.png） */}
+          {/* 圓形 LOGO（影像檔位於 public/logo.png） */}
           <div className="logoWrap">
             <img className="logo" src={logo} alt="OrderPeek Logo" />
           </div>
 
           {/* 標語 */}
-          <p className="tagline">1370 幫你買 | 中日韓動漫代購</p>
+          <p className="tagline">1370 幫你搞定｜中日動漫代購</p>
 
-          {/* 登入表單 (抽出元件) */}
+          {/* 登入表單 */}
           <Login />
         </section>
       </main>
 
-      {/* 底部瀏覽統計（先前端，日後改後端真數據） */}
+      {/* 底部瀏覽統計（目前為前端暫存） */}
       <footer className="footer">
         <ViewsCounter className="views" />
       </footer>
