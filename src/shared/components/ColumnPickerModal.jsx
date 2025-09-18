@@ -75,7 +75,8 @@ export default function ColumnPickerModal({
           
           {/* 勾選區包裹層（避免撐破） */}
           <div style={{ minWidth: 0, maxWidth: "100%" }}>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12, minWidth: 0, maxWidth: "100%" }}>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12, minWidth: 0, maxWidth: "100%"}}>
+              <div style={{ flex: 1 }} />
               <button className="logoutBtn" type="button" onClick={selectAll}>全選</button>
               <button className="logoutBtn" type="button" onClick={clearAll}>全部清除</button>
             </div>
@@ -99,6 +100,7 @@ export default function ColumnPickerModal({
                 minWidth: 0,          // 🔑 防止在 grid/flex 中撐破寬度
                 maxWidth: "100%",     // 🔑 不得超過 modal 內容寬
                 alignContent: "start" // 讓兩行的行高計算更穩定
+                
               }}
             >
               {headers.map((h, i) => (
@@ -176,7 +178,7 @@ export default function ColumnPickerModal({
 
           {/* 底部按鈕列：也避免撐破 */}
           <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", minWidth: 0, maxWidth: "100%" }}>
-            <button className="logoutBtn" type="button" onClick={onClose}>取消</button>
+            
             <button className="logoutBtn" type="button" onClick={handleSave}>儲存欄位</button>
           </div>
         </div>

@@ -24,10 +24,11 @@
       <strong style={{ wordBreak: "break-all" }}>{file.name}</strong>
       <span style={{ opacity: 0.7 }}>（{(file.size / 1024).toFixed(1)} KB）</span>
 
-      <button type="button" onClick={onClear} className="logoutBtn" style={{ marginLeft: "auto" }}>
+      <button type="button" onClick={onClear} className="logoutBtn">
         移除
       </button>
-
+      
+      <div style={{ flex: 1 }} />
       {hasHeaders && (
         <>
           <button type="button" className="logoutBtn" onClick={onOpenColumnPicker}>
