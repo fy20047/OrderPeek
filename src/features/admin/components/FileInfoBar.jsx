@@ -30,7 +30,7 @@
       
       <div style={{ flex: 1 }} />
       {hasHeaders && (
-        <>
+        <> 
           <button type="button" className="logoutBtn" onClick={onOpenColumnPicker}>
             選擇要公開的欄位
           </button>
