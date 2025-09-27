@@ -18,7 +18,7 @@
         display: "flex",
         alignItems: "center",
         gap: 8,
-      }}
+      }} 
     >
       <span>已選檔案：</span>
       <strong style={{ wordBreak: "break-all" }}>{file.name}</strong>
